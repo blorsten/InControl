@@ -2,13 +2,13 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using InControl;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 
 //#if UNITY_EDITOR
 //using UnityEditor;
 //#endif
-
 
 /**
  * WARNING: This is NOT an example of how to use InControl.
@@ -26,41 +26,38 @@ namespace InControl
 		List<LogMessage> logMessages = new List<LogMessage>();
 		bool isPaused;
 
-
 		void OnEnable()
 		{
 			isPaused = false;
 			Time.timeScale = 1.0f;
 
-			Logger.OnLogMessage += logMessage => logMessages.Add( logMessage );
+			Logger.OnLogMessage += logMessage => logMessages.Add(logMessage);
 
-//			InputManager.HideDevicesWithProfile( typeof( Xbox360MacProfile ) );
+			//			InputManager.HideDevicesWithProfile( typeof( Xbox360MacProfile ) );
 
-			InputManager.OnDeviceAttached += inputDevice => Debug.Log( "Attached: " + inputDevice.Name );
-			InputManager.OnDeviceDetached += inputDevice => Debug.Log( "Detached: " + inputDevice.Name );
-			InputManager.OnActiveDeviceChanged += inputDevice => Debug.Log( "Active device changed to: " + inputDevice.Name );
+			InputManager.OnDeviceAttached += inputDevice => Debug.Log("Attached: " + inputDevice.Name);
+			InputManager.OnDeviceDetached += inputDevice => Debug.Log("Detached: " + inputDevice.Name);
+			InputManager.OnActiveDeviceChanged += inputDevice => Debug.Log("Active device changed to: " + inputDevice.Name);
 
 			TestInputMappings();
 
-//			Debug.Log( "Unity Version: " + InputManager.UnityVersion );
+			//			Debug.Log( "Unity Version: " + InputManager.UnityVersion );
 		}
-
 
 		void FixedUpdate()
 		{
 			CheckForPauseButton();
 
-//			var inputDevice = InputManager.ActiveDevice;
-//			if (inputDevice.Direction.Left.WasPressed)
-//			{
-//				Debug.Log( "Left.WasPressed" );
-//			}
-//			if (inputDevice.Direction.Left.WasReleased)
-//			{
-//				Debug.Log( "Left.WasReleased" );
-//			}
+			//			var inputDevice = InputManager.ActiveDevice;
+			//			if (inputDevice.Direction.Left.WasPressed)
+			//			{
+			//				Debug.Log( "Left.WasPressed" );
+			//			}
+			//			if (inputDevice.Direction.Left.WasReleased)
+			//			{
+			//				Debug.Log( "Left.WasReleased" );
+			//			}
 		}
-
 
 		void Update()
 		{
@@ -69,28 +66,25 @@ namespace InControl
 				CheckForPauseButton();
 			}
 
-			if (Input.GetKeyDown( KeyCode.R ))
+			if (Input.GetKeyDown(KeyCode.R))
 			{
-				Application.LoadLevel( "TestInputManager" );
+				SceneManager.LoadScene("TestInputManager");
 			}
 		}
 
-
 		void CheckForPauseButton()
 		{
-			if (Input.GetKeyDown( KeyCode.P ) || InputManager.MenuWasPressed)
+			if (Input.GetKeyDown(KeyCode.P) || InputManager.MenuWasPressed)
 			{
 				Time.timeScale = isPaused ? 1.0f : 0.0f;
 				isPaused = !isPaused;
 			}
 		}
 
-
-		void SetColor( Color color )
+		void SetColor(Color color)
 		{
 			style.normal.textColor = color;
 		}
-
 
 		void OnGUI()
 		{
@@ -100,29 +94,29 @@ namespace InControl
 			var lineHeight = 15;
 
 			GUI.skin.font = font;
-			SetColor( Color.white );
+			SetColor(Color.white);
 
 			string info = "Devices:";
 			info += " (Platform: " + InputManager.Platform + ")";
-//			info += " (Joysticks " + InputManager.JoystickHash + ")";
+			//			info += " (Joysticks " + InputManager.JoystickHash + ")";
 			info += " " + InputManager.ActiveDevice.Direction.Vector;
 
-//			#if UNITY_EDITOR
-//			if (EditorWindow.focusedWindow != null)
-//			{
-//				info += " " + EditorWindow.focusedWindow.ToString();
-//			}
-//			#endif
+			//			#if UNITY_EDITOR
+			//			if (EditorWindow.focusedWindow != null)
+			//			{
+			//				info += " " + EditorWindow.focusedWindow.ToString();
+			//			}
+			//			#endif
 
 			if (isPaused)
 			{
-				SetColor( Color.red );
+				SetColor(Color.red);
 				info = "+++ PAUSED +++";
 			}
 
-			GUI.Label( new Rect( x, y, x + w, y + 10 ), info, style );
+			GUI.Label(new Rect(x, y, x + w, y + 10), info, style);
 
-			SetColor( Color.white );
+			SetColor(Color.white);
 
 			foreach (var inputDevice in InputManager.Devices)
 			{
@@ -131,15 +125,15 @@ namespace InControl
 
 				y = 35;
 
-				SetColor( color );
+				SetColor(color);
 
-				GUI.Label( new Rect( x, y, x + w, y + 10 ), inputDevice.Name, style );
+				GUI.Label(new Rect(x, y, x + w, y + 10), inputDevice.Name, style);
 				y += lineHeight;
 
-				GUI.Label( new Rect( x, y, x + w, y + 10 ), "SortOrder: " + inputDevice.SortOrder, style );
+				GUI.Label(new Rect(x, y, x + w, y + 10), "SortOrder: " + inputDevice.SortOrder, style);
 				y += lineHeight;
 
-				GUI.Label( new Rect( x, y, x + w, y + 10 ), "LastChangeTick: " + inputDevice.LastChangeTick, style );
+				GUI.Label(new Rect(x, y, x + w, y + 10), "LastChangeTick: " + inputDevice.LastChangeTick, style);
 				y += lineHeight;
 
 				foreach (var control in inputDevice.Controls)
@@ -150,55 +144,52 @@ namespace InControl
 
 						if (inputDevice.IsKnown)
 						{
-							controlName = string.Format( "{0} ({1})", control.Target, control.Handle );
+							controlName = string.Format("{0} ({1})", control.Target, control.Handle);
 						}
 						else
 						{
 							controlName = control.Handle;
 						}
 
-						SetColor( control.State ? Color.green : color );
-						var label = string.Format( "{0} {1}", controlName, control.State ? "= " + control.Value : "" );
-						GUI.Label( new Rect( x, y, x + w, y + 10 ), label, style );
+						SetColor(control.State ? Color.green : color);
+						var label = string.Format("{0} {1}", controlName, control.State ? "= " + control.Value : "");
+						GUI.Label(new Rect(x, y, x + w, y + 10), label, style);
 						y += lineHeight;
 					}
 				}
 
-				SetColor( Color.cyan );
+				SetColor(Color.cyan);
 				var anyButton = inputDevice.AnyButton;
 				if (anyButton)
 				{
-					GUI.Label( new Rect( x, y, x + w, y + 10 ), "AnyButton = " + anyButton.Handle, style );
+					GUI.Label(new Rect(x, y, x + w, y + 10), "AnyButton = " + anyButton.Handle, style);
 				}
 
 				x += 200;
 			}
 
-
 			Color[] logColors = { Color.gray, Color.yellow, Color.white };
-			SetColor( Color.white );
+			SetColor(Color.white);
 			x = 10;
 			y = Screen.height - (10 + lineHeight);
 			for (int i = logMessages.Count - 1; i >= 0; i--)
 			{
 				var logMessage = logMessages[i];
-				SetColor( logColors[(int) logMessage.type] );
+				SetColor(logColors[(int) logMessage.type]);
 				foreach (var line in logMessage.text.Split('\n'))
 				{
-					GUI.Label( new Rect( x, y, Screen.width, y + 10 ), line, style );
+					GUI.Label(new Rect(x, y, Screen.width, y + 10), line, style);
 					y -= lineHeight;
 				}
 			}
 		}
 
-
 		void OnDrawGizmos()
 		{
 			Vector3 delta = InputManager.ActiveDevice.Direction.Vector * 4.0f;
 			Gizmos.color = Color.yellow;
-			Gizmos.DrawSphere( delta, 1 );
+			Gizmos.DrawSphere(delta, 1);
 		}
-
 
 		void TestInputMappings()
 		{
@@ -208,38 +199,38 @@ namespace InControl
 			var noInvert = false;
 			var doInvert = true;
 
-			TestInputMapping( complete, complete, noInvert, -1.0f, 0.0f, 1.0f );
-			TestInputMapping( complete, negative, noInvert, -1.0f, -0.5f, 0.0f );
-			TestInputMapping( complete, positive, noInvert, 0.0f, 0.5f, 1.0f );
+			TestInputMapping(complete, complete, noInvert, -1.0f, 0.0f, 1.0f);
+			TestInputMapping(complete, negative, noInvert, -1.0f, -0.5f, 0.0f);
+			TestInputMapping(complete, positive, noInvert, 0.0f, 0.5f, 1.0f);
 
-			TestInputMapping( negative, complete, noInvert, -1.0f, 1.0f, 0.0f );
-			TestInputMapping( negative, negative, noInvert, -1.0f, 0.0f, 0.0f );
-			TestInputMapping( negative, positive, noInvert, 0.0f, 1.0f, 0.0f );
+			TestInputMapping(negative, complete, noInvert, -1.0f, 1.0f, 0.0f);
+			TestInputMapping(negative, negative, noInvert, -1.0f, 0.0f, 0.0f);
+			TestInputMapping(negative, positive, noInvert, 0.0f, 1.0f, 0.0f);
 
-			TestInputMapping( positive, complete, noInvert, 0.0f, -1.0f, 1.0f );
-			TestInputMapping( positive, negative, noInvert, 0.0f, -1.0f, 0.0f );
-			TestInputMapping( positive, positive, noInvert, 0.0f, 0.0f, 1.0f );
+			TestInputMapping(positive, complete, noInvert, 0.0f, -1.0f, 1.0f);
+			TestInputMapping(positive, negative, noInvert, 0.0f, -1.0f, 0.0f);
+			TestInputMapping(positive, positive, noInvert, 0.0f, 0.0f, 1.0f);
 
-			TestInputMapping( complete, complete, doInvert, 1.0f, 0.0f, -1.0f );
-			TestInputMapping( complete, negative, doInvert, 1.0f, 0.5f, 0.0f );
-			TestInputMapping( complete, positive, doInvert, 0.0f, -0.5f, -1.0f );
+			TestInputMapping(complete, complete, doInvert, 1.0f, 0.0f, -1.0f);
+			TestInputMapping(complete, negative, doInvert, 1.0f, 0.5f, 0.0f);
+			TestInputMapping(complete, positive, doInvert, 0.0f, -0.5f, -1.0f);
 
-			TestInputMapping( negative, complete, doInvert, 1.0f, -1.0f, 0.0f );
-			TestInputMapping( negative, negative, doInvert, 1.0f, 0.0f, 0.0f );
-			TestInputMapping( negative, positive, doInvert, 0.0f, -1.0f, 0.0f );
+			TestInputMapping(negative, complete, doInvert, 1.0f, -1.0f, 0.0f);
+			TestInputMapping(negative, negative, doInvert, 1.0f, 0.0f, 0.0f);
+			TestInputMapping(negative, positive, doInvert, 0.0f, -1.0f, 0.0f);
 
-			TestInputMapping( positive, complete, doInvert, 0.0f, 1.0f, -1.0f );
-			TestInputMapping( positive, negative, doInvert, 0.0f, 1.0f, 0.0f );
-			TestInputMapping( positive, positive, doInvert, 0.0f, 0.0f, -1.0f );
+			TestInputMapping(positive, complete, doInvert, 0.0f, 1.0f, -1.0f);
+			TestInputMapping(positive, negative, doInvert, 0.0f, 1.0f, 0.0f);
+			TestInputMapping(positive, positive, doInvert, 0.0f, 0.0f, -1.0f);
 		}
 
-
-		void TestInputMapping( InputControlMapping.Range sourceRange, InputControlMapping.Range targetRange, bool invert, float expectA, float expectB, float expectC )
+		void TestInputMapping(InputControlMapping.Range sourceRange, InputControlMapping.Range targetRange, bool invert, float expectA, float expectB, float expectC)
 		{
-			var mapping = new InputControlMapping() {
+			var mapping = new InputControlMapping()
+			{
 				SourceRange = sourceRange,
-				TargetRange = targetRange,
-				Invert = invert
+					TargetRange = targetRange,
+					Invert = invert
 			};
 
 			float input;
@@ -259,29 +250,26 @@ namespace InControl
 			if (targetRange == InputControlMapping.Range.Positive)
 				tr = "Positive";
 
-
 			input = -1.0f;
-			value = mapping.MapValue( input );
-			if (Mathf.Abs( value - expectA ) > Single.Epsilon)
+			value = mapping.MapValue(input);
+			if (Mathf.Abs(value - expectA) > Single.Epsilon)
 			{
-				Debug.LogError( "Input of " + input + " got value of " + value + " instead of " + expectA + " (SR = " + sr + ", TR = " + tr + ")" );
+				Debug.LogError("Input of " + input + " got value of " + value + " instead of " + expectA + " (SR = " + sr + ", TR = " + tr + ")");
 			}
 
 			input = 0.0f;
-			value = mapping.MapValue( input );
-			if (Mathf.Abs( value - expectB ) > Single.Epsilon)
+			value = mapping.MapValue(input);
+			if (Mathf.Abs(value - expectB) > Single.Epsilon)
 			{
-				Debug.LogError( "Input of " + input + " got value of " + value + " instead of " + expectB + " (SR = " + sr + ", TR = " + tr + ")" );
+				Debug.LogError("Input of " + input + " got value of " + value + " instead of " + expectB + " (SR = " + sr + ", TR = " + tr + ")");
 			}
 
 			input = 1.0f;
-			value = mapping.MapValue( input );
-			if (Mathf.Abs( value - expectC ) > Single.Epsilon)
+			value = mapping.MapValue(input);
+			if (Mathf.Abs(value - expectC) > Single.Epsilon)
 			{
-				Debug.LogError( "Input of " + input + " got value of " + value + " instead of " + expectC + " (SR = " + sr + ", TR = " + tr + ")" );
+				Debug.LogError("Input of " + input + " got value of " + value + " instead of " + expectC + " (SR = " + sr + ", TR = " + tr + ")");
 			}
 		}
 	}
 }
-
-

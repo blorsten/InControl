@@ -31,3 +31,5 @@ Thumbs.db
 /Assets/UnityTestTools
 /Assets/UnityTestTools.meta
 Ouya
+/.vs/
+/.vscode/
